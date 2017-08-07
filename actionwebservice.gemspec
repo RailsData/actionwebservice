@@ -10,8 +10,8 @@ Gem::Specification.new do |s|
   s.rubyforge_project = "aws"
   s.homepage = "http://www.rubyonrails.org"
 
-  s.add_dependency('actionpack', '~> 2.3.0')
-  s.add_dependency('activerecord', '~> 2.3.0')
+  s.add_dependency('actionpack', '> 2.3.0')
+  s.add_dependency('activerecord', '> 2.3.0')
 
   s.add_development_dependency('rake', '=10.5.0')
   s.add_development_dependency('rdoc', '=4.2.0')
