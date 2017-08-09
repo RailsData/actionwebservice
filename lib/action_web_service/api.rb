@@ -14,26 +14,26 @@ module ActionWebService # :nodoc:
     # See ActionWebService::Container::Direct::ClassMethods for an example
     # of use.
     class Base
-      # Whether to transform the public API method names into camel-cased names 
-      class_inheritable_option :inflect_names, true
+      # Whether to transform the public API method names into camel-cased names
+      cattr_accessor(:inflect_names) { true }
 
       # By default only HTTP POST requests are processed
-      class_inheritable_option :allowed_http_methods, [ :post ]
-       
+      cattr_accessor(:allowed_http_methods) { [ :post ] }
+
       # Whether to allow ActiveRecord::Base models in <tt>:expects</tt>.
       # The default is +false+; you should be aware of the security implications
       # of allowing this, and ensure that you don't allow remote callers to
       # easily overwrite data they should not have access to.
-      class_inheritable_option :allow_active_record_expects, false
+      cattr_accessor(:allow_active_record_expects) { false }
 
       # If present, the name of a method to call when the remote caller
       # tried to call a nonexistent method. Semantically equivalent to
       # +method_missing+.
-      class_inheritable_option :default_api_method
+      cattr_accessor :default_api_method
 
       # Disallow instantiation
       private_class_method :new, :allocate
-      
+
       class << self
         include ActionWebService::SignatureTypes
 
@@ -64,6 +64,9 @@ module ActionWebService # :nodoc:
         # [<tt>:expects</tt>]             Signature for the method input parameters
         # [<tt>:returns</tt>]             Signature for the method return value
         # [<tt>:expects_and_returns</tt>] Signature for both input parameters and return value
+        cattr_accessor(:api_methods) { {} }
+        cattr_accessor(:api_public_method_names) { {} }
+        cattr_accessor :default_api_method_instance_attr
         def api_method(name, options={})
           unless options.is_a?(Hash)
             raise(ActionWebServiceError, "Expected a Hash for options")
@@ -89,8 +92,8 @@ module ActionWebService # :nodoc:
           name = name.to_sym
           public_name = public_api_method_name(name)
           method = Method.new(name, public_name, expects, returns)
-          write_inheritable_hash("api_methods", name => method)
-          write_inheritable_hash("api_public_method_names", public_name => name)
+          api_methods[name] = method
+          api_public_method_names[public_name] = name
         end
 
         # Whether the given method name is a service method on this API
@@ -153,9 +156,9 @@ module ActionWebService # :nodoc:
         #     {:getCount=>#<ActionWebService::API::Method:0x24379d8 ...>,
         #      :getCompletedCount=>#<ActionWebService::API::Method:0x2437794 ...>}
         #   ProjectsApi.api_methods[:getCount].public_name #=> "GetCount"
-        def api_methods
-          read_inheritable_attribute("api_methods") || {}
-        end
+        # def api_methods
+        #   read_inheritable_attribute("api_methods") || {}
+        # end
 
         # The Method instance for the given public API method name, if any
         #
@@ -186,20 +189,20 @@ module ActionWebService # :nodoc:
         # The Method instance for the default API method, if any
         def default_api_method_instance
           return nil unless name = default_api_method
-          instance = read_inheritable_attribute("default_api_method_instance")
+          instance = default_api_method_instance_attr
           if instance && instance.name == name
             return instance
           end
           instance = Method.new(name, public_api_method_name(name), nil, nil)
-          write_inheritable_attribute("default_api_method_instance", instance)
+          default_api_method_instance_attr = instance
           instance
         end
 
         private
-          def api_public_method_names
-            read_inheritable_attribute("api_public_method_names") || {}
-          end
-  
+          # def api_public_method_names
+          #   read_inheritable_attribute("api_public_method_names") || {}
+          # end
+
           def validate_options(valid_option_keys, supplied_option_keys)
             unknown_option_keys = supplied_option_keys - valid_option_keys
             unless unknown_option_keys.empty?

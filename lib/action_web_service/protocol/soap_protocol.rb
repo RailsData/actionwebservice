@@ -13,10 +13,10 @@ module ActionWebService # :nodoc:
 
   module Protocol # :nodoc:
     module Soap # :nodoc:
+      cattr_accessor :wsdl_service_name
+      cattr_accessor :wsdl_namespace
       def self.included(base)
         base.register_protocol(SoapProtocol)
-        base.class_inheritable_option(:wsdl_service_name)
-        base.class_inheritable_option(:wsdl_namespace)
       end
       
       class SoapProtocol < AbstractProtocol # :nodoc:

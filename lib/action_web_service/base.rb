@@ -33,6 +33,6 @@ module ActionWebService # :nodoc:
   class Base
     # Whether to report exceptions back to the caller in the protocol's exception
     # format
-    class_inheritable_option :web_service_exception_reporting, true
+    cattr_accessor(:web_service_exception_reporting) { true }
   end
 end

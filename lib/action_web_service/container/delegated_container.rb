@@ -36,6 +36,8 @@ module ActionWebService # :nodoc:
         #
         #     web_service(:person) { PersonService.new(request.env) }
         #   end
+        cattr_accessor("web_services") { {} }
+        cattr_accessor("web_service_definition_callbacks") { [] }
         def web_service(name, object=nil, &block)
           if (object && block_given?) || (object.nil? && block.nil?)
             raise(ContainerError, "either service, or a block must be given")
@@ -46,7 +48,8 @@ module ActionWebService # :nodoc:
           else
             info = { name => { :object => object } }
           end
-          write_inheritable_hash("web_services", info)
+          web_services.merge(info)
+          #write_inheritable_hash("web_services", info)
           call_web_service_definition_callbacks(self, name, info)
         end
   
@@ -56,16 +59,19 @@ module ActionWebService # :nodoc:
         end
   
         def web_services # :nodoc:
-          read_inheritable_attribute("web_services") || {}
+          web_services || {}
+          #read_inheritable_attribute("web_services") || {}
         end
   
         def add_web_service_definition_callback(&block) # :nodoc:
-          write_inheritable_array("web_service_definition_callbacks", [block])
+          web_service_definition_callbacks << block
+          #write_inheritable_array("web_service_definition_callbacks", [block])
         end
   
         private
           def call_web_service_definition_callbacks(container_class, web_service_name, service_info)
-            (read_inheritable_attribute("web_service_definition_callbacks") || []).each do |block|
+            (web_service_definition_callbacks || []).each do |block|
+            #(read_inheritable_attribute("web_service_definition_callbacks") || []).each do |block|
               block.call(container_class, web_service_name, service_info)
             end
           end

@@ -81,29 +81,29 @@ module ActionWebService # :nodoc:
       alias :after_invocation :append_after_invocation
 
       def before_invocation_interceptors # :nodoc:
-        read_inheritable_attribute("before_invocation_interceptors")
+        #read_inheritable_attribute("before_invocation_interceptors")
       end
 
       def after_invocation_interceptors # :nodoc:
-        read_inheritable_attribute("after_invocation_interceptors")
+        #read_inheritable_attribute("after_invocation_interceptors")
       end
 
       def included_intercepted_methods # :nodoc:
-        read_inheritable_attribute("included_intercepted_methods") || {}
+        #read_inheritable_attribute("included_intercepted_methods") || {}
       end
       
       def excluded_intercepted_methods # :nodoc:
-        read_inheritable_attribute("excluded_intercepted_methods") || {}
+        #read_inheritable_attribute("excluded_intercepted_methods") || {}
       end
 
       private
         def append_interceptors_to_chain(condition, interceptors)
-          write_inheritable_array("#{condition}_invocation_interceptors", interceptors)
+          #write_inheritable_array("#{condition}_invocation_interceptors", interceptors)
         end
 
         def prepend_interceptors_to_chain(condition, interceptors)
-          interceptors = interceptors + read_inheritable_attribute("#{condition}_invocation_interceptors")
-          write_inheritable_attribute("#{condition}_invocation_interceptors", interceptors)
+          #interceptors = interceptors + read_inheritable_attribute("#{condition}_invocation_interceptors")
+          #write_inheritable_attribute("#{condition}_invocation_interceptors", interceptors)
         end
 
         def extract_conditions!(interceptors)
@@ -114,8 +114,8 @@ module ActionWebService # :nodoc:
         def add_interception_conditions(interceptors, conditions)
           return unless conditions
           included, excluded = conditions[:only], conditions[:except]
-          write_inheritable_hash("included_intercepted_methods", condition_hash(interceptors, included)) && return if included
-          write_inheritable_hash("excluded_intercepted_methods", condition_hash(interceptors, excluded)) if excluded
+          #write_inheritable_hash("included_intercepted_methods", condition_hash(interceptors, included)) && return if included
+          #write_inheritable_hash("excluded_intercepted_methods", condition_hash(interceptors, excluded)) if excluded
         end
 
         def condition_hash(interceptors, *methods)
@@ -184,7 +184,7 @@ module ActionWebService # :nodoc:
         def interceptor_block?(interceptor)
           interceptor.respond_to?("call") && (interceptor.arity == 3 || interceptor.arity == -1)
         end
-        
+
         def interceptor_class?(interceptor)
           interceptor.respond_to?("intercept")
         end
@@ -193,7 +193,7 @@ module ActionWebService # :nodoc:
           case
             when self.class.included_intercepted_methods[interceptor]
               !self.class.included_intercepted_methods[interceptor].include?(method_name)
-            when self.class.excluded_intercepted_methods[interceptor] 
+            when self.class.excluded_intercepted_methods[interceptor]
               self.class.excluded_intercepted_methods[interceptor].include?(method_name)
           end
         end

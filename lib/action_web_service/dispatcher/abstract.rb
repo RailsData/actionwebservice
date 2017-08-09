@@ -2,6 +2,8 @@ require 'benchmark'
 
 module ActionWebService # :nodoc:
   module Dispatcher # :nodoc:
+    cattr_accessor :web_service_dispatching_mode
+    cattr_accessor :web_service_exception_reporting
     class DispatcherError < ActionWebService::ActionWebServiceError # :nodoc:
       def initialize(*args)
         super
@@ -10,8 +12,8 @@ module ActionWebService # :nodoc:
     end
 
     def self.included(base) # :nodoc:
-      base.class_inheritable_option(:web_service_dispatching_mode, :direct)
-      base.class_inheritable_option(:web_service_exception_reporting, true)
+      web_service_dispatching_mode = :direct
+      web_service_exception_reporting = true
       base.send(:include, ActionWebService::Dispatcher::InstanceMethods)
     end
 
